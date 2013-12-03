@@ -2,14 +2,12 @@ require 'sinatra'
 require 'data_mapper'
 require 'dm-serializer'
 require 'pry'
-require_relative 'bookmark'
+require_relative 'db/bookmark'
+require_relative 'db/tagging'
+require_relative 'db/tag'
 
-DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/bookmarks.db")
+DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/db/bookmarks.db")
 DataMapper.finalize.auto_upgrade!
-
-def get_all_bookmarks
-  Bookmark.all(:order => :title)
-end
 
 before "/bookmarks/:id" do |id|
   @bookmark = Bookmark.get(id)
@@ -28,6 +26,7 @@ post "/bookmarks" do
   input = params.slice "url", "title"
   bookmark = Bookmark.create input
   if bookmark.save
+    add_tags(bookmark)
     # Created
     [201, "/bookmarks/#{bookmark['id']}"]
   else
@@ -53,6 +52,35 @@ end
 delete "/bookmarks/:id" do |id|
   @bookmark.destroy
   200 # OK
+end
+
+helpers do
+  def add_tags(bookmark)
+    labels = (params["tagsAsString"] || "").split(",").map(&:strip)
+
+    # more code to come
+    existing_labels = []
+    bookmark.taggings.each do |tagging|
+      if labels.include? tagging.tag.label
+        existing_labels.push tagging.tag.label
+      else
+        tagging.destroy
+      end
+    end
+
+    (labels - existing_labels).each do |label|
+      tag = {:label => label}
+      existing = Tag.first tag
+      if !existing
+        existing = Tag.create tag
+      end
+      Tagging.create :tag => existing, :bookmark => bookmark
+    end
+  end
+end
+
+def get_all_bookmarks
+  Bookmark.all(:order => :title)
 end
 
 class Hash
