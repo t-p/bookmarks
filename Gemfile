@@ -3,6 +3,7 @@ ruby '2.0.0'
 
 gem 'sinatra'
 gem 'sqlite3'
+gem 'mustache'
 gem 'data_mapper'
 gem 'dm-sqlite-adapter'
 
