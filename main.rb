@@ -18,8 +18,14 @@ before "/bookmarks/:id" do |id|
 end
 
 get "/bookmarks" do
-  content_type :json
-  get_all_bookmarks.to_json
+  bookmarks = Bookmark.all
+  tags = params[:splat].first.split "/"
+
+  tags.each do |tag|
+    bookmarks = bookmarks.all({:taggings => {:tag => {:label => tag}}})
+  end
+
+  bookmarks.to_json with_tagList
 end
 
 post "/bookmarks" do
