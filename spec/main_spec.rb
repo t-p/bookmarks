@@ -1,12 +1,17 @@
-require_relative "main"
-require "rspec"
-require "rack/test"
+require "#{File.dirname(__FILE__)}/spec_helper"
 
 describe "Bookmark application" do
   include Rack::Test::Methods
 
   def app
     Sinatra::Application
+  end
+
+  it "returns a list of bookmarks" do
+    get "/bookmarks"
+    last_response.should be_ok
+    bookmarks = JSON.parse(last_response.body)
+    bookmarks.should be_instance_of(Array)
   end
 
   it "creates a new bookmark" do
@@ -45,9 +50,10 @@ describe "Bookmark application" do
   end
 
   it "sends an error code for an invalid update request" do
-    get "/bookmarks"
-    bookmarks = JSON.parse(last_response.body)
-    id = bookmarks.first['id']
+    post "/bookmarks",
+      {:url => "http://www.test.com", :title => "Test"}
+    bookmark_uri = last_response.body
+    id = bookmark_uri.split("/").last
 
     put "/bookmarks/#{id}", {:url => "Invalid"}
     last_response.status.should == 400

@@ -17,7 +17,24 @@ before "/bookmarks/:id" do |id|
   end
 end
 
-get "/bookmarks" do
+with_tagList = {:methods => [:tagList]}
+
+get "/bookmarks/:id" do
+  content_type :json
+  @bookmark.to_json with_tagList
+end
+
+put "/bookmarks/:id" do
+  input = params.slice "url", "title"
+
+  if @bookmark.update input
+    204 # No Content
+  else
+    400 # Bad Request
+  end
+end
+
+get "/bookmarks/*" do
   bookmarks = Bookmark.all
   tags = params[:splat].first.split "/"
 
@@ -26,6 +43,11 @@ get "/bookmarks" do
   end
 
   bookmarks.to_json with_tagList
+end
+
+get "/bookmarks" do
+  content_type :json
+  get_all_bookmarks.to_json with_tagList
 end
 
 post "/bookmarks" do
@@ -40,22 +62,7 @@ post "/bookmarks" do
   end
 end
 
-get "/bookmarks/:id" do |id|
-  content_type :json
-  @bookmark.to_json
-end
-
-put "/bookmarks/:id" do |id|
-  input = params.slice "url", "title"
-
-  if @bookmark.update input
-    204 # No Content
-  else
-    400 # Bad Request
-  end
-end
-
-delete "/bookmarks/:id" do |id|
+delete "/bookmarks/:id" do
   @bookmark.destroy
   200 # OK
 end
