@@ -1,7 +1,8 @@
 require 'sinatra'
 require 'data_mapper'
 require 'dm-serializer'
-require "sinatra/mustache"
+require 'mustache'
+require 'json'
 require 'pry'
 require_relative 'db/bookmark'
 require_relative 'db/tagging'
