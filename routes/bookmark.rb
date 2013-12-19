@@ -1,4 +1,4 @@
-class App
+class App < Sinatra::Base
 
   before "/bookmarks/:id" do |id|
     @bookmark = Bookmark.get(id)
@@ -58,10 +58,6 @@ class App
     200 # OK
   end
 
-  get "/" do
-    redirect "/base"
-  end
-
   get "/:view" do
     @views = [
       {:view => "base",       :label => "Base"},
@@ -77,17 +73,15 @@ class App
       end
     end
 
-    @view_template = IO.read("views/#{@view}.html")
+    @view_template = IO.read("public/#{@view}.html")
 
-    mustache :layout
+    haml :index
   end
-
 
   helpers do
     def add_tags(bookmark)
       labels = (params["tagsAsString"] || "").split(",").map(&:strip)
 
-      # more code to come
       existing_labels = []
       bookmark.taggings.each do |tagging|
         if labels.include? tagging.tag.label
