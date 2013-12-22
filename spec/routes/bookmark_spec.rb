@@ -1,10 +1,11 @@
-require "#{File.dirname(__FILE__)}/spec_helper"
+require File.join(File.dirname(__FILE__), '../spec_helper')
 
 describe "Bookmark application" do
   include Rack::Test::Methods
 
+
   def app
-    Sinatra::Application
+    App.new
   end
 
   it "returns a list of bookmarks" do

@@ -105,10 +105,10 @@ class App < Sinatra::Base
   def get_all_bookmarks
     Bookmark.all(:order => :title)
   end
+end
 
-  class Hash
-    def slice(*whitelist)
-      whitelist.inject({}) {|result, key| result.merge(key => self[key])}
-    end
+class Hash
+  def slice(*whitelist)
+    whitelist.inject({}) {|result, key| result.merge(key => self[key])}
   end
 end
