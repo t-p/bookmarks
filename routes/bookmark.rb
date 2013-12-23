@@ -42,9 +42,10 @@ class App < Sinatra::Base
   end
 
   post "/bookmarks" do
+    params = JSON.parse(request.body.read)
     input = params.slice "url", "title"
     bookmark = Bookmark.create input
-    if bookmark.save
+    if bookmark.save!
       add_tags(bookmark)
       # Created
       [201, "/bookmarks/#{bookmark['id']}"]

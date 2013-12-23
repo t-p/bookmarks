@@ -1,28 +1,35 @@
-//(function(app) {
-//  debugger;
-//  app.factory("Bookmark", function($resource) {
-//    return $resource("/bookmarks/:id", {id:"@id"});
-//  });
-//
-//  app.controller('TextController',
-//    function($scope) {
-//    var someText = {};
-//    someText.message = 'You have started your journey.';
-//    $scope.someText = someText;
-//})(
-//  angular.module("app_base", ["ngResource"])
-//);
+var bookmarkModule = angular.module('app_base', ['ngResource']);
 
-var myAppModule = angular.module('app_base', ['ngResource']);
+bookmarkModule.factory("Bookmark", function($resource) {
+  return $resource("/bookmarks/:id", {id:"@id"})
+});
 
-myAppModule.factory("Bookmark", ['$resource',
-  function($resource) {
-    return $resource("/bookmarks/:id", {id:"@id"});
-}]);
-myAppModule.factory("bookmarks", function(Bookmark) {
+bookmarkModule.factory("bookmarks", function(Bookmark) {
   return Bookmark.query();
 });
-myAppModule.factory("saveBookmark", function(bookmarks, state) {
+
+bookmarkModule.factory("deleteBookmark", function(bookmarks) {
+  return function(bookmark) {
+    var index = bookmarks.indexOf(bookmark);
+    bookmark.$delete();
+    bookmarks.splice(index, 1);
+  };
+});
+
+bookmarkModule.service("state", function(Bookmark) {
+  this.formBookmark = {bookmark:new Bookmark()};
+  this.clearForm = function() {
+    this.formBookmark.bookmark = new Bookmark();
+  };
+});
+
+bookmarkModule.factory("editBookmark", function(state) {
+  return function(bookmark) {
+    state.formBookmark.bookmark = bookmark;
+  };
+});
+
+bookmarkModule.factory("saveBookmark", function(bookmarks, state) {
   return function(bookmark) {
     if (!bookmark.id) {
       bookmarks.push(bookmark);
@@ -31,22 +38,16 @@ myAppModule.factory("saveBookmark", function(bookmarks, state) {
     state.clearForm();
   };
 });
-myAppModule.service("state", function(Bookmark) {
-  this.formBookmark = {bookmark:new Bookmark()};
-  this.clearForm = function() {
-    this.formBookmark.bookmark = new Bookmark();
-  };
+
+bookmarkModule.controller("BookmarkFormController", function($scope, state, bookmarks, saveBookmark) {
+  $scope.formBookmark = state.formBookmark;
+  $scope.saveBookmark = saveBookmark;
+  $scope.clearForm = state.clearForm;
 });
 
-myAppModule.controller("BookmarkFormController",
-  function($scope, state, bookmarks, saveBookmark) {
-    $scope.formBookmark = state.formBookmark;
-    $scope.saveBookmark = saveBookmark;
-    $scope.clearForm = state.clearForm;
+bookmarkModule.controller("BookmarkListController", function($scope, bookmarks, deleteBookmark, editBookmark) {
+  $scope.bookmarks = bookmarks;
+  $scope.deleteBookmark = deleteBookmark;
+  $scope.editBookmark = editBookmark;
 });
-myAppModule.controller('TextController',
-  function($scope) {
-  var someText = {};
-  someText.message = 'You have started your journey.';
-  $scope.someText = someText;
-});
+

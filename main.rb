@@ -5,6 +5,8 @@ require 'dm-serializer'
 require 'json'
 require 'pry'
 
+Dir["#{File.dirname(__FILE__)}/db/*.rb"].each {|file| require file}
+
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/db/bookmarks.db")
 DataMapper.finalize.auto_upgrade!
 
@@ -13,7 +15,6 @@ class App < Sinatra::Base
   set :haml,  :format => :html5
   set :root, File.dirname(__FILE__)
 
-  Dir["#{root}/db/*.rb"].each {|file| require file}
 end
 
 require_relative 'routes/init'
