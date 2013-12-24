@@ -21,7 +21,7 @@ describe "Bookmark application" do
     last_size = bookmarks.size
 
     post "/bookmarks",
-      {:url => "http://www.test.com", :title => "Test"}
+      "{\"url\":\"http://www.test.com\",\"title\":\"Test\"}"
     last_response.status.should == 201
     last_response.body.should match(/\/bookmarks\/\d+/)
 
@@ -31,13 +31,13 @@ describe "Bookmark application" do
   end
 
   it "sends an error code for an invalid create request" do
-    post "/bookmarks", {:url => "test", :title => "Test"}
+    post "/bookmarks", "{\"url\":\"test\",\"title\":\"Test\"}"
     last_response.status.should == 400
   end
 
   it "updates a bookmark" do
     post "/bookmarks",
-      {:url => "http://www.test.com", :title => "Test"}
+      "{\"url\":\"http://www.test.com\",\"title\":\"Test\"}"
     bookmark_uri = last_response.body
     id = bookmark_uri.split("/").last
 
@@ -52,7 +52,7 @@ describe "Bookmark application" do
 
   it "sends an error code for an invalid update request" do
     post "/bookmarks",
-      {:url => "http://www.test.com", :title => "Test"}
+      "{\"url\":\"http://www.test.com\",\"title\":\"Test\"}"
     bookmark_uri = last_response.body
     id = bookmark_uri.split("/").last
 
@@ -66,7 +66,7 @@ describe "Bookmark application" do
     last_size = bookmarks.size
 
     post "/bookmarks",
-      {:url => "http://www.test.com", :title => "Test"}
+      "{\"url\":\"http://www.test.com\",\"title\":\"Test\"}"
     bookmark_uri = last_response.body
     id = bookmark_uri.split("/").last
 
