@@ -16,13 +16,6 @@ bookmarkModule.factory("deleteBookmark", function(bookmarks) {
   };
 });
 
-bookmarkModule.service("state", function(Bookmark) {
-  this.formBookmark = {bookmark:new Bookmark()};
-  this.clearForm = function() {
-    this.formBookmark.bookmark = new Bookmark();
-  };
-});
-
 bookmarkModule.factory("editBookmark", function(state) {
   return function(bookmark) {
     state.formBookmark.bookmark = bookmark;
@@ -39,6 +32,13 @@ bookmarkModule.factory("saveBookmark", function(bookmarks, state) {
   };
 });
 
+bookmarkModule.service("state", function(Bookmark) {
+  this.formBookmark = {bookmark:new Bookmark()};
+  this.clearForm = function() {
+    this.formBookmark.bookmark = new Bookmark();
+  };
+});
+
 bookmarkModule.controller("BookmarkFormController", function($scope, state, bookmarks, saveBookmark) {
   $scope.formBookmark = state.formBookmark;
   $scope.saveBookmark = saveBookmark;
@@ -50,4 +50,3 @@ bookmarkModule.controller("BookmarkListController", function($scope, bookmarks, 
   $scope.deleteBookmark = deleteBookmark;
   $scope.editBookmark = editBookmark;
 });
-
